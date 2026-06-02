@@ -3,9 +3,11 @@ from modules.text_cleaner import cleaner
 from modules.chunker import splitter
 from pprint import pprint
 
-text = extract_text("documents/persian_sample_for_project.pdf")
+pdf = extract_text("documents/persian_sample_for_project.pdf")
 
-for page in text:
-    normals = cleaner(page)
+for page in pdf:
+    normals = cleaner(page['text'])
     chunks = splitter(normals)
     pprint(chunks)
+    print(f'page number: {page['page_number']} \n'
+          f'page chunks: {len(chunks)}')
