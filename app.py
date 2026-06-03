@@ -7,7 +7,8 @@ pdf = extract_text("documents/persian_sample_for_project.pdf")
 
 for page in pdf:
     normals = cleaner(page['text'])
+    # pprint(normals)
     chunks = splitter(normals)
+
+    pprint(f'page number: {page['page_number']}')
     pprint(chunks)
-    print(f'page number: {page['page_number']} \n'
-          f'page chunks: {len(chunks)}')
