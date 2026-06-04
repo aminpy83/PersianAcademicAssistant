@@ -12,4 +12,9 @@ def build_index(vectors):
 
 
 def search(index, query_vector, k=3):
-    ...
+    distances, indices = index.search(
+        query_vector.reshape(1, -1),
+        k
+    )
+
+    return indices[0]

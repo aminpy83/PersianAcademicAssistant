@@ -1,19 +1,36 @@
-def splitter(text: str, page_number: int, chunk_id: int):
-    sentences = []
+def splitter(
+        text: str,
+        page_number: int,
+        chunk_id: int,
+        window_size: int = 7,
+        overlap: int = 2
+):
+    stride = window_size - overlap
+    lines = []
+
     for line in text.splitlines():
-        if not line.strip():
+        if line.strip():
+            lines.append(line.strip())
+
+    chunks = []
+
+    for start in range(0, len(lines), stride):
+
+        chunk_text = " ".join(
+            lines[start:start + window_size]
+        )
+
+        if not chunk_text:
             continue
-        sentences.append(line)
-    sentences = tuple(sentences)
 
-    paragraphs = []  # chunks
-
-    for i in range(2, len(sentences), 5):
-        paragraphs.append({
-            'page_number': page_number,
-            'chunk_id': chunk_id,
-            'text': ' '.join(sentences[i - 2:i + 5])
+        chunks.append({
+            "page_number": page_number,
+            "chunk_id": chunk_id,
+            "text": chunk_text,
+            "line_start": start,
+            "line_end": start + window_size
         })
+
         chunk_id += 1
 
-    return paragraphs, chunk_id
+    return chunks, chunk_id

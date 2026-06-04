@@ -15,7 +15,6 @@ for page in pdf:
     normals = cleaner(page['text'])
     chunks, chunk_id = splitter(normals, page['page_number'], chunk_id)
 
-
     for chunk in chunks:
         vector = get_embedding(chunk['text']).astype("float32")
 
@@ -27,5 +26,15 @@ for page in pdf:
 all_vectors = np.array(all_vectors, dtype="float32")
 
 index = build_index(all_vectors)
-pprint(all_chunks)
 print(index.ntotal)
+query = "معماری پیشنهادی چیست؟"
+
+query_vector = get_embedding(query).astype("float32")
+
+result = search(index, query_vector)
+
+for idx in result:
+    print("=" * 50)
+    print(all_chunks[idx]["page_number"])
+    print(all_chunks[idx]["chunk_id"])
+    print(all_chunks[idx]["text"])

@@ -1,7 +1,14 @@
+import re
 from hazm import Normalizer
 
-normalize = Normalizer().normalize
+normalizer = Normalizer()
 
 
-def cleaner(text: str):
-    return normalize(text)
+def cleaner(text: str) -> str:
+    text = normalizer.normalize(text)
+
+    text = re.sub(r'\s+', ' ', text)
+
+    text = text.strip()
+
+    return text
