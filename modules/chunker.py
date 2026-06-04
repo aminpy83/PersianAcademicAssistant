@@ -1,13 +1,13 @@
-def splitter(text: str, page_number: int):
+def splitter(text: str, page_number: int, chunk_id: int):
     sentences = []
     for line in text.splitlines():
-        if not line.replace(' ', ''):
+        if not line.strip():
             continue
         sentences.append(line)
     sentences = tuple(sentences)
 
-    paragraphs = []
-    chunk_id = 1
+    paragraphs = []  # chunks
+
     for i in range(2, len(sentences), 5):
         paragraphs.append({
             'page_number': page_number,
@@ -16,4 +16,4 @@ def splitter(text: str, page_number: int):
         })
         chunk_id += 1
 
-    return paragraphs
+    return paragraphs, chunk_id

@@ -2,3 +2,5 @@
 pymupdf
 hazm
 sentence-transformers
+faiss-cpu
+numpy
