@@ -2,8 +2,8 @@ def splitter(
         text: str,
         page_number: int,
         chunk_id: int,
-        window_size: int = 7,
-        overlap: int = 2
+        window_size: int = 4,
+        overlap: int = 1
 ):
     stride = window_size - overlap
     lines = []

@@ -4,6 +4,7 @@ from modules.text_cleaner import cleaner
 from modules.chunker import splitter
 from modules.embedding import get_embedding
 from modules.vector_store import build_index, search
+from modules.reetriver import retrieve
 from pprint import pprint
 
 pdf = extract_text("documents/persian_sample_for_project.pdf")
@@ -29,12 +30,15 @@ index = build_index(all_vectors)
 print(index.ntotal)
 query = "معماری پیشنهادی چیست؟"
 
-query_vector = get_embedding(query).astype("float32")
+results = retrieve(
+    query=query,
+    index=index,
+    chunks=all_chunks,
+    k=3
+)
 
-result = search(index, query_vector)
-
-for idx in result:
+for item in results:
     print("=" * 50)
-    print(all_chunks[idx]["page_number"])
-    print(all_chunks[idx]["chunk_id"])
-    print(all_chunks[idx]["text"])
+    print(item["page_number"])
+    print(item["chunk_id"])
+    print(item["text"])
