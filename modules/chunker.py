@@ -1,34 +1,46 @@
+import re
+
+
 def splitter(
         text: str,
         page_number: int,
         chunk_id: int,
-        window_size: int = 4,
+        window_size: int = 5,
         overlap: int = 1
 ):
-    stride = window_size - overlap
-    lines = []
 
-    for line in text.splitlines():
-        if line.strip():
-            lines.append(line.strip())
+    sentences = re.split(
+        r'(?<=[.!؟])\s+',
+        text
+    )
+
+    sentences = [
+        s.strip()
+        for s in sentences
+        if s.strip()
+    ]
+
+    stride = window_size - overlap
 
     chunks = []
 
-    for start in range(0, len(lines), stride):
+    for start in range(
+            0,
+            len(sentences),
+            stride
+    ):
 
-        chunk_text = " ".join(
-            lines[start:start + window_size]
-        )
+        chunk_sentences = sentences[
+            start:start + window_size
+        ]
 
-        if not chunk_text:
+        if not chunk_sentences:
             continue
 
         chunks.append({
             "page_number": page_number,
             "chunk_id": chunk_id,
-            "text": chunk_text,
-            "line_start": start,
-            "line_end": start + window_size
+            "text": " ".join(chunk_sentences)
         })
 
         chunk_id += 1

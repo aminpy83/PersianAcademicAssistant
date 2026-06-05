@@ -5,10 +5,18 @@ normalizer = Normalizer()
 
 
 def cleaner(text: str) -> str:
+
     text = normalizer.normalize(text)
 
-    text = re.sub(r'\s+', ' ', text)
+    # حذف فاصله‌های انتهای خطوط
+    text = re.sub(r'[ \t]+', ' ', text)
 
-    text = text.strip()
+    # حذف خطوط خالی اضافی
+    text = re.sub(r'\n\s*\n+', '\n\n', text)
 
-    return text
+    # حذف فاصله‌های اضافی اطراف خطوط
+    lines = [line.strip() for line in text.splitlines()]
+
+    text = "\n".join(lines)
+
+    return text.strip()
