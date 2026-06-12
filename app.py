@@ -13,7 +13,7 @@ from modules.answer_builder import build_answer, summarize_document
 # ۱. تنظیمات صفحه (حالت عریض برای نمایش بهتر)
 st.set_page_config(page_title="M.Amin P.Yeganeh", page_icon="🎓", layout="wide")
 
-# ۲. تزریق CSS ایمن (فقط برای راست‌چین کردن متن‌ها بدون تغییر ساختار صفحه)
+# RTL texts
 st.markdown("""
     <style>
         * { font-family: Tahoma, 'Segoe UI', sans-serif; }
@@ -21,39 +21,60 @@ st.markdown("""
             text-align: right !important;
             direction: rtl !important;
         }
-        /* مخفی کردن فوتر استریم‌لیت برای ظاهر تمیزتر */
         footer {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# ۳. هدر و عنوان سایت
+# header
 st.markdown("<h1>🎓 دستیار هوشمند و تحلیلگر اسناد</h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='color: gray; font-size: 14px;'>فایل خود را آپلود کنید و با استفاده از هوش مصنوعی محتوای آن را تحلیل کنید.</p>",
     unsafe_allow_html=True)
 st.divider()
 
-# ۴. تنظیمات در سایدبار (منوی کناری)
+# sidebar
 with st.sidebar:
     st.header("⚙️ تنظیمات سیستم")
-    api_key = st.text_input("🔑 کلید API گوگل:", type="password")
+
+    # model provider
+    provider = st.selectbox(
+        "🌐 انتخاب سرویس‌دهنده هوش مصنوعی:",
+        ["Gemini", "Ollama (Local models)", "OpenRouter"]
+    )
+
+    model_name = ""
+    api_key = ""
+
+    # options
+    if provider == "Gemini":
+        model_name = st.text_input("🤖 نام مدل جمنای:", value="gemini-2.5-flash")
+        api_key = st.text_input("google 🔑 API-key: ", type="password")
+
+    elif provider == "Ollama (Local)":
+        model_name = st.text_input("🤖 نام مدل لوکال:", value="llama3")
+        st.info("💡 مطمئن شوید نرم‌افزار Ollama روی سیستم شما در حال اجراست.")
+
+    elif provider == "OpenRouter":
+        model_name = st.text_input("🤖 نام مدل اوپن‌راوتر:", value="meta-llama/llama-3-8b-instruct:free")
+        api_key = st.text_input("🔑 openrouter API-key: ", type="password")
+
+    st.divider()
 
     if st.button("🗑️ پاکسازی و شروع مجدد", use_container_width=True):
         st.session_state.clear()
         st.rerun()
 
     st.divider()
-    st.markdown("💡 **راهنما:** ابتدا کلید را وارد کرده بعد زدن اینتر فایل خود را آپلود کنید.")
+    st.markdown("💡 **راهنما:** ابتدا سرویس‌دهنده و تنظیمات را مشخص کرده، سپس فایل خود را آپلود کنید.")
 
-# ۵. بررسی کلید API
-if not api_key:
-    st.info("👈 برای شروع، لطفاً کلید API خود را در منوی سمت چپ وارد کنید.")
-    st.stop()  # متوقف کردن اجرای ادامه کد تا زمانی که کلید وارد شود
+# api check
+if provider in ["Gemini", "OpenRouter"] and not api_key:
+    st.info(f"👈 برای شروع، لطفاً API-key مربوط به {provider} را در منوی سمت چپ وارد کنید.")
+    st.stop()
 
-# ۶. چیدمان ستونی برای آپلود و وضعیت
 col1, col2 = st.columns([2, 1])
 
-# ۶. بخش آپلود فایل و وضعیت سیستم (یکپارچه و تمام‌عرض)
+# upload
 uploaded_file = st.file_uploader("📄 آپلود فایل PDF", type=["pdf"])
 
 if uploaded_file is None:
@@ -61,13 +82,13 @@ if uploaded_file is None:
 elif 'index' in st.session_state:
     st.success("✅ پردازش تمام شد! فایل شما آماده پرسش و پاسخ است.")
 
-# ۷. پردازش فایل با نمایش مراحل
+# writing file
 if uploaded_file and 'index' not in st.session_state:
     temp_path = f"temp_{uuid.uuid4().hex}.pdf"
     with open(temp_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    # استفاده از st.status برای نمایش مراحل کار به صورت حرفه‌ای
+    # showing states
     with st.status("در حال تحلیل و پردازش سند...", expanded=True) as status:
         st.write("🔍 استخراج متن از صفحات...")
         pdf = extract_text(temp_path)
@@ -97,41 +118,40 @@ if uploaded_file and 'index' not in st.session_state:
         status.update(label="پردازش با موفقیت انجام شد!", state="complete", expanded=False)
         if os.path.exists(temp_path): os.remove(temp_path)
 
-# ۸. بخش تعاملی (چت و خلاصه)
+# chat & summarize
 if 'index' in st.session_state:
     st.divider()
     tab_chat, tab_summary = st.tabs(["💬 گفتگوی هوشمند (Q&A)", "📝 خلاصه مدیریتی"])
 
     with tab_chat:
-        # مدیریت تاریخچه چت
+        # history
         if "messages" not in st.session_state:
             st.session_state.messages = []
 
-        # نمایش پیام‌های قبلی
+        # last message
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        # دریافت ورودی جدید کاربر با رابط کاربری چت
         if prompt := st.chat_input("سوال خود را از متن فایل بپرسید..."):
 
-            # نمایش پیام کاربر
+            # answer
             st.chat_message("user").markdown(prompt)
             st.session_state.messages.append({"role": "user", "content": prompt})
 
-            # تولید و نمایش پاسخ دستیار
+            # generator
             with st.chat_message("assistant"):
                 with st.spinner("در حال بررسی منابع..."):
                     results = retrieve(prompt, st.session_state['index'], st.session_state['all_chunks'], k=3)
-                    answer = build_answer(prompt, results, api_key)
+                    # فراخوانی تابع با آرگومان‌های جدید
+                    answer = build_answer(prompt, results, provider, model_name, api_key)
                     st.markdown(answer)
 
-                    # نمایش منابع به صورت کشویی (تمیز و مرتب)
                     with st.expander("🔍 مشاهده منابع ارجاعی"):
                         for i, res in enumerate(results):
                             st.caption(f"صفحه {res['page_number']}: {res['text'][:150]}...")
 
-            # ذخیره در تاریخچه
+            # save history
             st.session_state.messages.append({"role": "assistant", "content": answer})
 
     with tab_summary:
@@ -139,6 +159,7 @@ if 'index' in st.session_state:
         # استفاده از دکمه primary برای جلب توجه بیشتر
         if st.button("🚀 تولید خلاصه سند", type="primary"):
             with st.spinner("در حال پردازش کل متن (ممکن است کمی طول بکشد)..."):
-                summary = summarize_document(st.session_state['full_text'], api_key)
+                # فراخوانی تابع خلاصه ساز با آرگومان‌های جدید سرویس‌دهنده
+                summary = summarize_document(st.session_state['full_text'], provider, model_name, api_key)
                 st.markdown("---")
                 st.markdown(summary)

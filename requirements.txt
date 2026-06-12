@@ -7,3 +7,4 @@ numpy
 transformers
 streamlit
 protobuf
+requests
