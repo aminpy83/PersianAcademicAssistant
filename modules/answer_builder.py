@@ -3,10 +3,7 @@ import requests
 
 
 def _call_llm(provider: str, model_name: str, api_key: str, prompt: str, default_model: str) -> str:
-    """
-    تابع مرکزی و هوشمند برای مدیریت درخواست‌ها به سرویس‌دهنده‌های مختلف
-    """
-    # ۱. حالت گوگل جمنای
+    # google studio
     if provider == "Gemini":
         try:
             genai.configure(api_key=api_key)
@@ -17,7 +14,7 @@ def _call_llm(provider: str, model_name: str, api_key: str, prompt: str, default
         except Exception as e:
             return f"خطا در ارتباط با جمنای: {str(e)}"
 
-    # ۲. حالت مدل‌های محلی اولاما (Ollama)
+    # ollama local models
     elif provider == "Ollama (Local)":
         selected_model = model_name if model_name else "llama3"
         url = "http://localhost:11434/api/generate"

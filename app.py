@@ -36,10 +36,10 @@ st.divider()
 with st.sidebar:
     st.header("⚙️ تنظیمات سیستم")
 
-    # model provider
+    # model providers
     provider = st.selectbox(
         "🌐 انتخاب سرویس‌دهنده هوش مصنوعی:",
-        ["Gemini", "Ollama (Local models)", "OpenRouter"]
+        ["Gemini", "Ollama (Local)", "OpenRouter"]
     )
 
     model_name = ""
@@ -86,6 +86,7 @@ elif 'index' in st.session_state:
 if uploaded_file and 'index' not in st.session_state:
     temp_path = f"temp_{uuid.uuid4().hex}.pdf"
     with open(temp_path, "wb") as f:
+        # noinspection PyUnresolvedReferences
         f.write(uploaded_file.getbuffer())
 
     # showing states
@@ -142,8 +143,10 @@ if 'index' in st.session_state:
             # generator
             with st.chat_message("assistant"):
                 with st.spinner("در حال بررسی منابع..."):
+                    # noinspection PyTypeChecker
                     results = retrieve(prompt, st.session_state['index'], st.session_state['all_chunks'], k=3)
                     # فراخوانی تابع با آرگومان‌های جدید
+                    # noinspection PyTypeChecker
                     answer = build_answer(prompt, results, provider, model_name, api_key)
                     st.markdown(answer)
 
@@ -160,6 +163,7 @@ if 'index' in st.session_state:
         if st.button("🚀 تولید خلاصه سند", type="primary"):
             with st.spinner("در حال پردازش کل متن (ممکن است کمی طول بکشد)..."):
                 # فراخوانی تابع خلاصه ساز با آرگومان‌های جدید سرویس‌دهنده
+                # noinspection PyTypeChecker
                 summary = summarize_document(st.session_state['full_text'], provider, model_name, api_key)
                 st.markdown("---")
                 st.markdown(summary)
