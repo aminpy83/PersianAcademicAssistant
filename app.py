@@ -38,7 +38,7 @@ with st.sidebar:
 
     # model providers
     provider = st.selectbox(
-        "🌐 انتخاب سرویس‌دهنده هوش مصنوعی:",
+        "🌐 model provider",
         ["Gemini", "Ollama (Local)", "OpenRouter"]
     )
 
@@ -47,16 +47,17 @@ with st.sidebar:
 
     # options
     if provider == "Gemini":
-        model_name = st.text_input("🤖 نام مدل جمنای:", value="gemini-2.5-flash")
-        api_key = st.text_input("google 🔑 API-key: ", type="password")
+        model_name = st.text_input("🤖 model", value="gemini-2.5-flash")
+        api_key = st.text_input("google 🔑 API-key", type="password")
 
     elif provider == "Ollama (Local)":
-        model_name = st.text_input("🤖 نام مدل لوکال:", value="llama3")
-        st.info("💡 مطمئن شوید نرم‌افزار Ollama روی سیستم شما در حال اجراست.")
+        model_name = st.text_input("🤖 local model", value="llama3")
+        st.info("برای اجرا باید پروژه رو از گیتهاب کلون کنید")
+        st.markdown("💡مطمئن شوید نرم‌افزار Ollama روی سیستم شما در حال اجراست.")
 
     elif provider == "OpenRouter":
-        model_name = st.text_input("🤖 نام مدل اوپن‌راوتر:", value="meta-llama/llama-3-8b-instruct:free")
-        api_key = st.text_input("🔑 openrouter API-key: ", type="password")
+        model_name = st.text_input("🤖 model", value="meta-llama/llama-3-8b-instruct:free")
+        api_key = st.text_input("🔑 openrouter API-key", type="password")
 
     st.divider()
 
