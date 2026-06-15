@@ -48,7 +48,8 @@ with st.sidebar:
     # options
     if provider == "Gemini":
         model_name = st.text_input("🤖 model", value="gemini-2.5-flash")
-        api_key = st.text_input("google 🔑 API-key", type="password")
+        api_key = st.text_input("google 🔑 API-key"
+                                "", type="password")
 
     elif provider == "Ollama (Local)":
         model_name = st.text_input("🤖 local model", value="llama3")
@@ -56,7 +57,7 @@ with st.sidebar:
         st.markdown("💡مطمئن شوید نرم‌افزار Ollama روی سیستم شما در حال اجراست.")
 
     elif provider == "OpenRouter":
-        model_name = st.text_input("🤖 model", value="meta-llama/llama-3-8b-instruct:free")
+        model_name = st.text_input("🤖 model", value="google/gemma-4-31b-it:free")
         api_key = st.text_input("🔑 openrouter API-key", type="password")
 
     st.divider()
